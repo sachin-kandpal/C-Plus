@@ -74,32 +74,43 @@ int main() {
 // bettter
 
 
-// // judge versio
+// // judge version
 // class Solution {
 // public:
-//     int subarraySum(vector<int>& nums, int k) {
+//     int subarraySum(vector<int>& arr, int k) {
 
-//         unordered_map<int, int> mp;
-
-//         // Prefix sum 0 occurs once before the array starts
-//         mp[0] = 1;
-
-//         int prefixSum = 0;
+//         int n = arr.size();
 //         int count = 0;
 
-//         for (int i = 0; i < nums.size(); i++) {
+//         // Create prefix sum array
+//         vector<int> prefixSum(n, 0);
 
-//             // Update running sum
-//             prefixSum += nums[i];
+//         prefixSum[0] = arr[0];
 
-//             // If (prefixSum - k) exists,
-//             // add its frequency to answer
-//             if (mp.find(prefixSum - k) != mp.end()) {
-//                 count += mp[prefixSum - k];
+//         // Build prefix sums
+//         for (int i = 1; i < n; i++) {
+//             prefixSum[i] = prefixSum[i - 1] + arr[i];
+//         }
+
+//         // Stores frequency of previous prefix sums
+//         unordered_map<int, int> mp;
+
+//         for (int i = 0; i < n; i++) {
+
+//             // Subarray starting from index 0
+//             if (prefixSum[i] == k)
+//                 count++;
+
+//             // Required previous prefix sum
+//             int val = prefixSum[i] - k;
+
+//             // Add all previous occurrences
+//             if (mp.find(val) != mp.end()) {
+//                 count += mp[val];
 //             }
 
 //             // Store current prefix sum
-//             mp[prefixSum]++;
+//             mp[prefixSum[i]]++;
 //         }
 
 //         return count;
@@ -111,25 +122,40 @@ int main() {
 // using namespace std;
 
 // // Function to count subarrays with sum k
-// int subarraySum(vector<int> &nums, int k) {
-//     int n = nums.size();
+// int subarraySum(vector<int>& arr, int k) {
+
+//     int n = arr.size();
 //     int count = 0;
 
-//     // Fix starting index
+//     // Prefix sum array
+//     vector<int> prefixSum(n, 0);
+
+//     // First prefix sum
+//     prefixSum[0] = arr[0];
+
+//     // Build prefix sum array
+//     for (int i = 1; i < n; i++) {
+//         prefixSum[i] = prefixSum[i - 1] + arr[i];
+//     }
+
+//     // Hash map stores frequency of prefix sums
+//     unordered_map<int, int> mp;
+
 //     for (int i = 0; i < n; i++) {
 
-//         int sum = 0;
+//         // If subarray starts from index 0
+//         if (prefixSum[i] == k)
+//             count++;
 
-//         // Extend ending index
-//         for (int j = i; j < n; j++) {
+//         // Find required prefix sum
+//         int val = prefixSum[i] - k;
 
-//             sum += nums[j];
-
-//             // Check if current subarray sum equals k
-//             if (sum == k) {
-//                 count++;
-//             }
+//         if (mp.find(val) != mp.end()) {
+//             count += mp[val];
 //         }
+
+//         // Store current prefix sum
+//         mp[prefixSum[i]]++;
 //     }
 
 //     return count;
@@ -137,11 +163,11 @@ int main() {
 
 // int main() {
 
-//     vector<int> nums = {1, 1, 1};
-//     int k = 2;
+//     vector<int> arr = {1, 2, 3};
+//     int k = 3;
 
 //     cout << "Number of subarrays = "
-//          << subarraySum(nums, k) << endl;
+//          << subarraySum(arr, k) << endl;
 
 //     return 0;
 // }
