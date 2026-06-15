@@ -162,65 +162,78 @@ int main() {
 // =============================================================
 
 /*
-void setZeroesOptimal(vector<vector<int>>& matrix) {
+#include <bits/stdc++.h>
+using namespace std;
+
+void setZeroes(vector<vector<int>>& matrix) {
+
     int n = matrix.size();
     int m = matrix[0].size();
 
-    bool col0 = false;   // separate flag for column 0
+    bool firstRow = false;
+    bool firstCol = false;
 
-    // Step 1 & 2: scan matrix, mark first row/col as indicators
+    // Step 1: Mark rows and columns
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
+
             if (matrix[i][j] == 0) {
-                matrix[i][0] = 0;          // mark row i via first col
+
+                if (i == 0)
+                    firstRow = true;
 
                 if (j == 0)
-                    col0 = true;            // col 0 itself has a zero
-                else
-                    matrix[0][j] = 0;      // mark col j via first row
+                    firstCol = true;
+
+                matrix[i][0] = 0;
+                matrix[0][j] = 0;
             }
         }
     }
 
-    // Step 3: zero out inner matrix [1..n-1][1..m-1] using markers
+    // Step 2: Update inner cells
     for (int i = 1; i < n; i++) {
         for (int j = 1; j < m; j++) {
-            if (matrix[i][0] == 0 || matrix[0][j] == 0)
+
+            if (matrix[i][0] == 0 || matrix[0][j] == 0) {
                 matrix[i][j] = 0;
+            }
+
         }
     }
 
-    // Step 4: handle first row (controlled by matrix[0][0])
-    if (matrix[0][0] == 0) {
-        for (int j = 0; j < m; j++)
+    // Step 3: Zero out first row if needed
+    if (firstRow) {
+        for (int j = 0; j < m; j++) {
             matrix[0][j] = 0;
+        }
     }
 
-    // Step 5: handle first col (controlled by col0 flag)
-    if (col0) {
-        for (int i = 0; i < n; i++)
+    // Step 4: Zero out first column if needed
+    if (firstCol) {
+        for (int i = 0; i < n; i++) {
             matrix[i][0] = 0;
+        }
     }
 }
 
 int main() {
-    vector<vector<int>> mat = {{1,1,1},{1,0,1},{1,1,1}};
 
-    cout << "===== OPTIMAL (First Row/Col Markers) =====" << endl;
-    cout << "Input:" << endl; printMatrix(mat);
-    setZeroesOptimal(mat);
-    cout << "Output:" << endl; printMatrix(mat);
+    vector<vector<int>> matrix = {
+        {1, 1, 1},
+        {1, 0, 1},
+        {1, 1, 1}
+    };
 
-    vector<vector<int>> mat2 = {{0,1,2},{3,4,5},{1,0,1}};
-    cout << "Input:" << endl; printMatrix(mat2);
-    setZeroesOptimal(mat2);
-    cout << "Output:" << endl; printMatrix(mat2);
+    setZeroes(matrix);
 
-    // now your turn test
-    vector<vector<int>> mat3 = {{1,2,3,4},{5,6,0,8},{9,10,11,12}};
-    cout << "Now your turn:" << endl; printMatrix(mat3);
-    setZeroesOptimal(mat3);
-    cout << "Output:" << endl; printMatrix(mat3);
+    cout << "Result:\n";
+    for (auto &row : matrix) {
+        for (auto val : row) {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
 
     return 0;
 }
@@ -236,33 +249,55 @@ int main() {
 class Solution {
 public:
     void setZeroes(vector<vector<int>>& matrix) {
-        int n = matrix.size(), m = matrix[0].size();
-        bool col0 = false;
 
-        // Step 1+2: mark first row and col
+        int n = matrix.size();
+        int m = matrix[0].size();
+
+        bool firstRow = false;
+        bool firstCol = false;
+
+        // Step 1: Use first row and first column as markers
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
+
                 if (matrix[i][j] == 0) {
+
+                    if (i == 0)
+                        firstRow = true;
+
+                    if (j == 0)
+                        firstCol = true;
+
                     matrix[i][0] = 0;
-                    if (j == 0) col0 = true;
-                    else        matrix[0][j] = 0;
+                    matrix[0][j] = 0;
                 }
             }
         }
 
-        // Step 3: zero inner matrix
-        for (int i = 1; i < n; i++)
-            for (int j = 1; j < m; j++)
-                if (matrix[i][0] == 0 || matrix[0][j] == 0)
+        // Step 2: Fill the inner matrix based on markers
+        for (int i = 1; i < n; i++) {
+            for (int j = 1; j < m; j++) {
+
+                if (matrix[i][0] == 0 || matrix[0][j] == 0) {
                     matrix[i][j] = 0;
+                }
 
-        // Step 4: zero first row
-        if (matrix[0][0] == 0)
-            for (int j = 0; j < m; j++) matrix[0][j] = 0;
+            }
+        }
 
-        // Step 5: zero first col
-        if (col0)
-            for (int i = 0; i < n; i++) matrix[i][0] = 0;
+        // Step 3: Handle the first row
+        if (firstRow) {
+            for (int j = 0; j < m; j++) {
+                matrix[0][j] = 0;
+            }
+        }
+
+        // Step 4: Handle the first column
+        if (firstCol) {
+            for (int i = 0; i < n; i++) {
+                matrix[i][0] = 0;
+            }
+        }
     }
 };
 */
