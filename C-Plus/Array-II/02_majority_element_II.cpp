@@ -6,31 +6,9 @@
 
   Find ALL elements appearing MORE THAN n/3 times.
   At most 2 such elements can exist (mathematical fact).
-
-  Example:
-    [3,2,3]           →  [3]
-    [1]               →  [1]
-    [1,2]             →  [1,2]
-    [1,2,3]           →  []
-    [1,1,1,3,3,2,2,2] →  [1,2]
-
-  NOTE: Raw array in VS Code. Judge uses vector<int>&.
-
-  HOW TO RUN:
-  → Keep only ONE main() uncommented at a time
   → Compile: g++ majority_element_2.cpp -o out && ./out
 =============================================================
 */
-
-#include <bits/stdc++.h>
-using namespace std;
-
-void printVec(vector<int>& v) {
-    cout << "[";
-    for (int i = 0; i < (int)v.size(); i++)
-        cout << v[i] << (i < (int)v.size()-1 ? ", " : "");
-    cout << "]" << endl;
-}
 
 
 // =============================================================
@@ -41,49 +19,57 @@ void printVec(vector<int>& v) {
 // STATUS: ACTIVE ← comment this main() to switch method
 // =============================================================
 
-vector<int> majorityBrute(int nums[], int n) {
-    vector<int> result;
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> majorityElement(vector<int> &nums) {
+
+    int n = nums.size();
+    vector<int> ls;
 
     for (int i = 0; i < n; i++) {
-        // only check if not already in result (avoid duplicates)
-        bool alreadyAdded = false;
-        for (int x : result)
-            if (x == nums[i]) { alreadyAdded = true; break; }
 
-        if (alreadyAdded) continue;
+        // Process only if list is empty or current element
+        // is different from the first stored majority element
+        if (ls.size() == 0 || ls[0] != nums[i]) {
 
-        int count = 0;
-        for (int j = 0; j < n; j++)       // count frequency
-            if (nums[j] == nums[i]) count++;
+            int cnt = 0;
 
-        if (count > n / 3)                 // majority II condition
-            result.push_back(nums[i]);
+            // Count frequency of nums[i]
+            for (int j = 0; j < n; j++) {
+                if (nums[j] == nums[i]) {
+                    cnt++;
+                }
+            }
+
+            // If frequency > n/3, add to answer
+            if (cnt > n / 3) {
+                ls.push_back(nums[i]);
+            }
+        }
+
+        // At most 2 majority elements can exist
+        if (ls.size() == 2)
+            break;
     }
-    return result;
+
+    return ls;
 }
 
 int main() {
-    cout << "===== BRUTE FORCE =====" << endl;
 
-    int a1[] = {3, 2, 3};
-    vector<int> r1 = majorityBrute(a1, 3);
-    cout << "[3,2,3]           → "; printVec(r1);   // [3]
+    vector<int> nums = {1, 1, 1, 3, 3, 2, 2, 2};
 
-    int a2[] = {1, 2};
-    vector<int> r2 = majorityBrute(a2, 2);
-    cout << "[1,2]             → "; printVec(r2);   // [1,2]
+    vector<int> ans = majorityElement(nums);
 
-    int a3[] = {1, 2, 3};
-    vector<int> r3 = majorityBrute(a3, 3);
-    cout << "[1,2,3]           → "; printVec(r3);   // []
+    cout << "Majority Elements: ";
+    for (int x : ans)
+        cout << x << " ";
 
-    int a4[] = {1,1,1,3,3,2,2,2};
-    vector<int> r4 = majorityBrute(a4, 8);
-    cout << "[1,1,1,3,3,2,2,2] → "; printVec(r4);  // [1,2]
+    cout << endl;
 
     return 0;
 }
-
 
 // =============================================================
 // METHOD 2 — BETTER (HashMap)
@@ -140,97 +126,80 @@ int main() {
 // METHOD 3 — OPTIMAL (Extended Boyer-Moore Voting)
 //
 // KEY MATH: at most 2 elements can appear > n/3 times
-//           → maintain exactly 2 candidates with 2 counts
-//
-// PASS 1 — Find candidates:
-//   if nums[i] == cand1 → cnt1++
-//   if nums[i] == cand2 → cnt2++
-//   if cnt1 == 0 → cand1 = nums[i], cnt1 = 1
-//   if cnt2 == 0 → cand2 = nums[i], cnt2 = 1
-//   else → cnt1--, cnt2--  (cancel both candidates)
-//
-// PASS 2 — Verify (MANDATORY — no guarantee they exist):
-//   Count actual frequency of cand1 and cand2
-//   Add to result only if freq > n/3
-//
-// WHY cnt1-- and cnt2-- together?
-//   Each cancellation removes one occurrence of cand1,
-//   one of cand2, and one of nums[i] → 3 elements cancel
-//   True majority (> n/3) survives all cancellations
-//
-// Time : O(N)   Space: O(1)
-// STATUS: COMMENTED — remove /* and */ below to activate
-// =============================================================
 
-/*
-vector<int> majorityOptimal(int nums[], int n) {
-    int cand1 = INT_MIN, cnt1 = 0;   // candidate 1 + its count
-    int cand2 = INT_MIN, cnt2 = 0;   // candidate 2 + its count
 
-    // ── Pass 1: Find 2 potential candidates ──────────────────
-    for (int i = 0; i < n; i++) {
 
-        if (nums[i] == cand1) {
-            cnt1++;                   // support candidate 1
-        }
-        else if (nums[i] == cand2) {
-            cnt2++;                   // support candidate 2
-        }
-        else if (cnt1 == 0) {
-            cand1 = nums[i];          // elect new candidate 1
-            cnt1 = 1;
-        }
-        else if (cnt2 == 0) {
-            cand2 = nums[i];          // elect new candidate 2
-            cnt2 = 1;
-        }
-        else {
-            cnt1--;                   // cancel: one vote vs cand1
-            cnt2--;                   // cancel: one vote vs cand2
-        }
-    }
+// #include <bits/stdc++.h>
+// using namespace std;
 
-    // ── Pass 2: Verify actual frequency ──────────────────────
-    int freq1 = 0, freq2 = 0;
-    for (int i = 0; i < n; i++) {
-        if (nums[i] == cand1) freq1++;
-        if (nums[i] == cand2) freq2++;
-    }
+// vector<int> majorityElement(vector<int> &nums) {
 
-    vector<int> result;
-    if (freq1 > n / 3) result.push_back(cand1);
-    if (freq2 > n / 3) result.push_back(cand2);
+//     int n = nums.size();
 
-    return result;
-}
+//     int cnt1 = 0, cnt2 = 0;
+//     int el1 = INT_MIN, el2 = INT_MIN;
 
-int main() {
-    cout << "===== OPTIMAL (Extended Boyer-Moore) =====" << endl;
+//     // Step 1: Find candidates
+//     for (int i = 0; i < n; i++) {
 
-    int a1[] = {3, 2, 3};
-    vector<int> r1 = majorityOptimal(a1, 3);
-    cout << "[3,2,3]            → "; printVec(r1);  // [3]
+//         if (cnt1 == 0 && el2 != nums[i]) {
+//             cnt1 = 1;
+//             el1 = nums[i];
+//         }
+//         else if (cnt2 == 0 && el1 != nums[i]) {
+//             cnt2 = 1;
+//             el2 = nums[i];
+//         }
+//         else if (nums[i] == el1) {
+//             cnt1++;
+//         }
+//         else if (nums[i] == el2) {
+//             cnt2++;
+//         }
+//         else {
+//             cnt1--;
+//             cnt2--;
+//         }
+//     }
 
-    int a2[] = {1, 2};
-    vector<int> r2 = majorityOptimal(a2, 2);
-    cout << "[1,2]              → "; printVec(r2);  // [1,2]
+//     // Step 2: Verify candidates
+//     cnt1 = 0;
+//     cnt2 = 0;
 
-    int a3[] = {1, 2, 3};
-    vector<int> r3 = majorityOptimal(a3, 3);
-    cout << "[1,2,3]            → "; printVec(r3);  // []
+//     for (int i = 0; i < n; i++) {
+//         if (nums[i] == el1)
+//             cnt1++;
 
-    int a4[] = {1,1,1,3,3,2,2,2};
-    vector<int> r4 = majorityOptimal(a4, 8);
-    cout << "[1,1,1,3,3,2,2,2]  → "; printVec(r4); // [1,2]
+//         if (nums[i] == el2)
+//             cnt2++;
+//     }
 
-    int a5[] = {1};
-    vector<int> r5 = majorityOptimal(a5, 1);
-    cout << "[1]                → "; printVec(r5);  // [1]
+//     vector<int> ans;
+//     int mini = (n / 3) + 1;
 
-    return 0;
-}
-*/
+//     if (cnt1 >= mini)
+//         ans.push_back(el1);
 
+//     if (cnt2 >= mini)
+//         ans.push_back(el2);
+
+//     return ans;
+// }
+
+// int main() {
+
+//     vector<int> nums = {1, 1, 1, 3, 3, 2, 2, 2};
+
+//     vector<int> ans = majorityElement(nums);
+
+//     cout << "Majority Elements: ";
+//     for (int x : ans)
+//         cout << x << " ";
+
+//     cout << endl;
+
+//     return 0;
+// }
 
 // =============================================================
 // JUDGE CODE — LeetCode #229
@@ -241,30 +210,57 @@ int main() {
 class Solution {
 public:
     vector<int> majorityElement(vector<int>& nums) {
+
         int n = nums.size();
-        int cand1 = INT_MIN, cnt1 = 0;
-        int cand2 = INT_MIN, cnt2 = 0;
 
-        // Pass 1: find candidates
-        for (int x : nums) {
-            if      (x == cand1) cnt1++;
-            else if (x == cand2) cnt2++;
-            else if (cnt1 == 0)  { cand1 = x; cnt1 = 1; }
-            else if (cnt2 == 0)  { cand2 = x; cnt2 = 1; }
-            else                 { cnt1--; cnt2--; }
+        int cnt1 = 0, cnt2 = 0;
+        int el1 = INT_MIN, el2 = INT_MIN;
+
+        // Step 1: Find potential candidates
+        for (int i = 0; i < n; i++) {
+
+            if (cnt1 == 0 && el2 != nums[i]) {
+                cnt1 = 1;
+                el1 = nums[i];
+            }
+            else if (cnt2 == 0 && el1 != nums[i]) {
+                cnt2 = 1;
+                el2 = nums[i];
+            }
+            else if (nums[i] == el1) {
+                cnt1++;
+            }
+            else if (nums[i] == el2) {
+                cnt2++;
+            }
+            else {
+                cnt1--;
+                cnt2--;
+            }
         }
 
-        // Pass 2: verify
-        int freq1 = 0, freq2 = 0;
-        for (int x : nums) {
-            if (x == cand1) freq1++;
-            if (x == cand2) freq2++;
+        // Step 2: Verify the candidates
+        cnt1 = 0;
+        cnt2 = 0;
+
+        for (int i = 0; i < n; i++) {
+            if (nums[i] == el1)
+                cnt1++;
+            if (nums[i] == el2)
+                cnt2++;
         }
 
-        vector<int> result;
-        if (freq1 > n / 3) result.push_back(cand1);
-        if (freq2 > n / 3) result.push_back(cand2);
-        return result;
+        vector<int> ans;
+
+        int mini = (n / 3) + 1;
+
+        if (cnt1 >= mini)
+            ans.push_back(el1);
+
+        if (cnt2 >= mini)
+            ans.push_back(el2);
+
+        return ans;
     }
 };
 */
