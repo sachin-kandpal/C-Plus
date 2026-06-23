@@ -1,23 +1,24 @@
 /*
 =============================================================
-  PROBLEM : Merge Overlapping Subintervals
-  Platform : LeetCode #56 (Medium)
+  PROBLEM : Merge Overlapping Intervals
+  Platform : Coding Ninjas / LeetCode #56
   Sheet    : Striver A2Z DSA (Arrays - Medium)
 
   Merge all overlapping intervals, return non-overlapping list.
 
   Example:
-    [[1,5],[3,6],[8,10],[15,18]] → [[1,6],[8,10],[15,18]]
-    [[5,7],[1,3],[4,6],[8,10]]   → [[1,3],[4,7],[8,10]]
-    [[1,4],[4,5]]                → [[1,5]]  (touching counts as overlap)
+    [[1,3],[2,4],[2,6],[8,9],[8,10],[9,11],[15,18],[16,17]]
+    → [[1,6],[8,11],[15,18]]
 
-  KEY RULE: sort by start time first → then a single pass
-            comparing only with the LAST merged interval works.
+  This file has BOTH versions you tested:
+    Method 1 → Brute (nested loop, extend inline) - Coding Ninjas style
+    Method 2 → Optimal (sort + single pass with ans.back()) - your LC submission
 
   NOTE: vector<vector<int>> used — 2D dynamic output.
 
   HOW TO RUN:
-  → Compile: g++ merge_intervals.cpp -o out && ./out
+  → Keep only ONE main() uncommented at a time
+  → Compile: g++ merge_intervals_two_versions.cpp -o out && ./out
 =============================================================
 */
 
@@ -35,42 +36,90 @@ void printResult(vector<vector<int>>& res) {
 
 
 // =============================================================
-// ONLY APPROACH — Sort + Single Pass Merge
-//
-// Step 1: Sort intervals by start time
-//         (this brings overlapping intervals adjacent)
-//
-// Step 2: Walk through sorted intervals
-//   For each interval:
-//     If ans is empty OR current.start > ans.back().end:
-//        → NO overlap → push current as new entry
-//     Else (current.start <= ans.back().end):
-//        → OVERLAP → merge: ans.back().end = max(ans.back().end, current.end)
-//
-// Why comparing only with ans.back() works:
-//   After sorting, if current doesn't overlap with the LAST
-//   merged interval, it can't overlap with any earlier one
-//   either (since all earlier ones end before or at ans.back())
-//
-// Time : O(N log N)   Space: O(N) for output
+// METHOD 1 — BRUTE FORCE (Coding Ninjas style)
+// Idea : Sort by start. For each interval i, extend merge by
+//        scanning ahead with j while overlap continues.
+//        Skip i if it's already covered by ans.back().
+// Time : O(N^2) worst case   Space: O(N)
+// STATUS: ACTIVE ← comment this main() to switch method
 // =============================================================
 
-vector<vector<int>> mergeOverlap(vector<vector<int>>& arr) {
+vector<vector<int>> mergeOverlappingIntervalsBrute(vector<vector<int>>& arr) {
     int n = arr.size();
+    sort(arr.begin(), arr.end());      // sort by start time
+    vector<vector<int>> ans;
 
-    // Step 1: sort by start time (arr[i][0])
-    sort(arr.begin(), arr.end());
+    for (int i = 0; i < n; i++) {
+        int start = arr[i][0];
+        int end   = arr[i][1];
 
+        // if this interval is already covered by the last merged interval, skip
+        if (!ans.empty() && end <= ans.back()[1]) {
+            continue;
+        }
+
+        // try to extend the merge by scanning ahead
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j][0] <= end) {
+                end = max(end, arr[j][1]);   // extend end if overlapping
+            } else {
+                break;                       // no more overlap, stop scanning
+            }
+        }
+
+        ans.push_back({start, end});         // push the fully merged interval
+    }
+    return ans;
+}
+
+int main() {
+    cout << "===== BRUTE FORCE (Coding Ninjas style) =====" << endl;
+
+    vector<vector<int>> v1 = {{1,3},{2,4},{3,5},{6,7}};
+    cout << "Input  : [[1,3],[2,4],[3,5],[6,7]]" << endl;
+    vector<vector<int>> r1 = mergeOverlappingIntervalsBrute(v1);
+    cout << "Output : "; printResult(r1);   // [[1,5],[6,7]]
+    cout << endl;
+
+    vector<vector<int>> v2 = {{1,3},{2,4},{2,6},{8,9},{8,10},{9,11},{15,18},{16,17}};
+    cout << "Input  : [[1,3],[2,4],[2,6],[8,9],[8,10],[9,11],[15,18],[16,17]]" << endl;
+    vector<vector<int>> r2 = mergeOverlappingIntervalsBrute(v2);
+    cout << "Output : "; printResult(r2);   // [[1,6],[8,11],[15,18]]
+    cout << endl;
+
+    vector<vector<int>> v3 = {{1,4},{4,5}};
+    cout << "Input  : [[1,4],[4,5]]  (touching)" << endl;
+    vector<vector<int>> r3 = mergeOverlappingIntervalsBrute(v3);
+    cout << "Output : "; printResult(r3);   // [[1,5]]
+
+    return 0;
+}
+
+
+// =============================================================
+// METHOD 2 — OPTIMAL (Sort + Single Pass with ans.back())
+// Idea : Sort by start. Walk once. Compare current interval
+//        only with the LAST merged interval in ans.
+//        Overlap → extend ans.back()'s end.
+//        No overlap → push as new entry.
+// Time : O(N log N)   Space: O(N)
+// STATUS: COMMENTED — remove /* and */ below to activate
+// =============================================================
+
+/*
+vector<vector<int>> mergeOverlappingIntervals(vector<vector<int>>& arr) {
+    int n = arr.size();
+    sort(arr.begin(), arr.end());      // sort by start time
     vector<vector<int>> ans;
 
     for (int i = 0; i < n; i++) {
 
-        // if ans is empty OR no overlap with last merged interval
+        // no overlap with last merged interval → push new entry
         if (ans.empty() || arr[i][0] > ans.back()[1]) {
-            ans.push_back(arr[i]);          // push as a new interval
+            ans.push_back(arr[i]);
         }
         else {
-            // overlap found → extend the end of last merged interval
+            // overlap → extend the end of the last merged interval
             ans.back()[1] = max(ans.back()[1], arr[i][1]);
         }
     }
@@ -78,46 +127,32 @@ vector<vector<int>> mergeOverlap(vector<vector<int>>& arr) {
 }
 
 int main() {
-    cout << "===== MERGE OVERLAPPING INTERVALS =====" << endl;
+    cout << "===== OPTIMAL (Sort + Single Pass) =====" << endl;
 
-    vector<vector<int>> v1 = {{1,5},{3,6},{8,10},{15,18}};
-    cout << "Input  : [[1,5],[3,6],[8,10],[15,18]]" << endl;
-    vector<vector<int>> r1 = mergeOverlap(v1);
-    cout << "Output : "; printResult(r1);   // [[1,6],[8,10],[15,18]]
+    vector<vector<int>> v1 = {{1,3},{2,4},{3,5},{6,7}};
+    cout << "Input  : [[1,3],[2,4],[3,5],[6,7]]" << endl;
+    vector<vector<int>> r1 = mergeOverlappingIntervals(v1);
+    cout << "Output : "; printResult(r1);   // [[1,5],[6,7]]
     cout << endl;
 
-    vector<vector<int>> v2 = {{5,7},{1,3},{4,6},{8,10}};
-    cout << "Input  : [[5,7],[1,3],[4,6],[8,10]]" << endl;
-    vector<vector<int>> r2 = mergeOverlap(v2);
-    cout << "Output : "; printResult(r2);   // [[1,3],[4,7],[8,10]]
+    vector<vector<int>> v2 = {{1,3},{2,4},{2,6},{8,9},{8,10},{9,11},{15,18},{16,17}};
+    cout << "Input  : [[1,3],[2,4],[2,6],[8,9],[8,10],[9,11],[15,18],[16,17]]" << endl;
+    vector<vector<int>> r2 = mergeOverlappingIntervals(v2);
+    cout << "Output : "; printResult(r2);   // [[1,6],[8,11],[15,18]]
     cout << endl;
 
-    // touching intervals (edge case)
     vector<vector<int>> v3 = {{1,4},{4,5}};
     cout << "Input  : [[1,4],[4,5]]  (touching)" << endl;
-    vector<vector<int>> r3 = mergeOverlap(v3);
+    vector<vector<int>> r3 = mergeOverlappingIntervals(v3);
     cout << "Output : "; printResult(r3);   // [[1,5]]
-    cout << endl;
-
-    // all overlapping into one
-    vector<vector<int>> v4 = {{1,4},{2,5},{3,6}};
-    cout << "Input  : [[1,4],[2,5],[3,6]]" << endl;
-    vector<vector<int>> r4 = mergeOverlap(v4);
-    cout << "Output : "; printResult(r4);   // [[1,6]]
-    cout << endl;
-
-    // no overlaps at all
-    vector<vector<int>> v5 = {{1,2},{3,4},{5,6}};
-    cout << "Input  : [[1,2],[3,4],[5,6]]" << endl;
-    vector<vector<int>> r5 = mergeOverlap(v5);
-    cout << "Output : "; printResult(r5);   // [[1,2],[3,4],[5,6]]
 
     return 0;
 }
+*/
 
 
 // =============================================================
-// JUDGE CODE — LeetCode #56
+// JUDGE CODE — matches your LeetCode submission exactly
 // Copy ONLY this class when submitting online
 // =============================================================
 
@@ -125,17 +160,14 @@ int main() {
 class Solution {
 public:
     vector<vector<int>> merge(vector<vector<int>>& intervals) {
-        sort(intervals.begin(), intervals.end());  // sort by start time
-
+        sort(intervals.begin(), intervals.end());
         vector<vector<int>> ans;
 
         for (int i = 0; i < (int)intervals.size(); i++) {
-
             if (ans.empty() || intervals[i][0] > ans.back()[1]) {
-                ans.push_back(intervals[i]);        // no overlap → new entry
-            }
-            else {
-                ans.back()[1] = max(ans.back()[1], intervals[i][1]); // merge
+                ans.push_back(intervals[i]);
+            } else {
+                ans.back()[1] = max(ans.back()[1], intervals[i][1]);
             }
         }
         return ans;
