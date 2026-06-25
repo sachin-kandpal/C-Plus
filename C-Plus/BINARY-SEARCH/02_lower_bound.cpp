@@ -1,3 +1,6 @@
+// also same code for search insert position
+
+
 // BRUTE FORCE  
 #include <bits/stdc++.h>
 using namespace std;
