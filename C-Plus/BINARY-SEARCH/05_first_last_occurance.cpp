@@ -2,36 +2,42 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// find last index of key by scanning from right
-int solve(int n, int key, vector<int>& v) {
-  // initialize result as not found
-  int res = -1;
-  // scan from the end toward the start
-  for (int i = n - 1; i >= 0; i--) {
-    // update and stop when match found
-    if (v[i] == key) {
-      res = i;
-      break;
+// Function to find both first and last occurrence
+pair<int, int> firstLastOccurrence(vector<int>& arr, int target) {
+
+    int first = -1;
+    int last = -1;
+
+    // Traverse the entire array
+    for (int i = 0; i < arr.size(); i++) {
+
+        if (arr[i] == target) {
+
+            // First occurrence
+            if (first == -1)
+                first = i;
+
+            // Update last occurrence every time
+            last = i;
+        }
     }
-  }
-  // return index or -1
-  return res;
+
+    return {first, last};
 }
 
-// program entry
 int main() {
-  // set size
-  int n = 7;
-  // set key to search
-  int key = 13;
-  // define input array
-  vector<int> v = {3, 4, 13, 13, 13, 20, 40};
-  // print last occurrence index (or -1)
-  cout << solve(n, key, v) << "\n";
-  // exit
-  return 0;
-}
 
+    vector<int> arr = {2, 4, 6, 8, 8, 8, 11, 13};
+
+    int target = 8;
+
+    pair<int, int> ans = firstLastOccurrence(arr, target);
+
+    cout << "First Occurrence = " << ans.first << endl;
+    cout << "Last Occurrence  = " << ans.second << endl;
+
+    return 0;
+}
 
 // // optimized approach
 // #include <bits/stdc++.h>
