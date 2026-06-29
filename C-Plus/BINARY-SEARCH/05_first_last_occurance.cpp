@@ -43,44 +43,71 @@ int main() {
 // #include <bits/stdc++.h>
 // using namespace std;
 
-// // find last index of key using binary search
-// int solve(int n, int key, vector<int>& v) {
-//   // initialize search bounds and result
-//   int start = 0;
-//   int end = n - 1;
-//   int res = -1;
+// // Function to find Lower Bound
+// int lowerBound(vector<int>& arr, int target) {
 
-//   // binary search loop
-//   while (start <= end) {
-//     // compute mid safely
-//     int mid = start + (end - start) / 2;
-//     // when match found, store index and move right
-//     if (v[mid] == key) {
-//       res = mid;
-//       start = mid + 1;
+//     int low = 0;
+//     int high = arr.size() - 1;
+//     int ans = arr.size();
+
+//     while (low <= high) {
+
+//         int mid = low + (high - low) / 2;
+
+//         if (arr[mid] >= target) {
+//             ans = mid;
+//             high = mid - 1;
+//         }
+//         else {
+//             low = mid + 1;
+//         }
 //     }
-//     // when key is smaller, move left
-//     else if (key < v[mid]) {
-//       end = mid - 1;
-//     }
-//     // otherwise move right
-//     else {
-//       start = mid + 1;
-//     }
-//   }
-//   // return last occurrence or -1
-//   return res;
+
+//     return ans;
 // }
 
-// // program entry
+// // Function to find Upper Bound
+// int upperBound(vector<int>& arr, int target) {
+
+//     int low = 0;
+//     int high = arr.size() - 1;
+//     int ans = arr.size();
+
+//     while (low <= high) {
+
+//         int mid = low + (high - low) / 2;
+
+//         if (arr[mid] > target) {
+//             ans = mid;
+//             high = mid - 1;
+//         }
+//         else {
+//             low = mid + 1;
+//         }
+//     }
+
+//     return ans;
+// }
+
 // int main() {
-//   // define input size and key
-//   int n = 7;
-//   int key = 13;
-//   // define sorted array
-//   vector<int> v = {3, 4, 13, 13, 13, 20, 40};
-//   // print last occurrence index (or -1)
-//   cout << solve(n, key, v) << "\n";
-//   // exit
-//   return 0;
+
+//     vector<int> arr = {2,4,6,8,8,8,11,13};
+
+//     int target = 8;
+
+//     int first = lowerBound(arr, target);
+
+//     // Target not found
+//     if (first == arr.size() || arr[first] != target) {
+//         cout << "First Occurrence = -1" << endl;
+//         cout << "Last Occurrence  = -1" << endl;
+//         return 0;
+//     }
+
+//     int last = upperBound(arr, target) - 1;
+
+//     cout << "First Occurrence = " << first << endl;
+//     cout << "Last Occurrence  = " << last << endl;
+
+//     return 0;
 // }
