@@ -1,3 +1,5 @@
+// Floor of $X$: The largest element in the array that is $\le X$ (less than or equal to $X$)
+// Ceil of $X$: The smallest element in the array that is $\ge X$ (greater than or equal to $X$).
 #include <bits/stdc++.h>
 using namespace std;
 
