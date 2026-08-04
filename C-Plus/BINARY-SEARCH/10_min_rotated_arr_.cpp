@@ -46,36 +46,28 @@ using namespace std;
 
 class Solution {
 public:
-    // Function to find the minimum element using binary search
     int findMin(vector<int>& nums) {
-
-        // Initialize low and high pointers
-        int low = 0, high = nums.size() - 1;
-
-        // Binary search loop
-        while (low < high) {
-
-            // Calculate mid index
+        int n = nums.size();
+        int low = 0;
+        int high = n-1;
+        int ans = INT_MAX;
+        while(low<=high){
             int mid = low + (high - low) / 2;
-
-            // Check which half to discard
-            if (nums[mid] > nums[high]) {
-
-                // Minimum lies in right half
-                low = mid + 1;
-
-            } else {
-
-                // Minimum lies in left half (including mid)
-                high = mid;
+            // left half sorted ko dekhte h
+            if(nums[low]<=nums[mid]){
+                ans = min(nums[low],ans);
+                low = mid +1; 
+            }
+            // right half sorted
+            else{
+                ans = min(nums[mid],ans);
+                high = mid -1;
             }
         }
-
-        // Return the minimum element
-        return nums[low];
+        return ans; 
+          
     }
 };
-
 int main() {
 
     // Input array
