@@ -7,14 +7,14 @@
 //     // Function to find a peak element in the array
 //     int findPeakElement(vector<int>& nums) {
 //         int n = nums.size();
-        
+
 //         // Traverse the array
 //         for (int i = 0; i < n; i++) {
 //             // Check left neighbor if exists
 //             bool left = (i == 0) || (nums[i] >= nums[i - 1]);
 //             // Check right neighbor if exists
 //             bool right = (i == n - 1) || (nums[i] >= nums[i + 1]);
-            
+
 //             // If both sides are valid, return index
 //             if (left && right) return i;
 //         }
@@ -33,49 +33,43 @@
 //     return 0;
 // }
 
-
-
 // ###############################//
 // optimal approach
 #include <bits/stdc++.h>
 using namespace std;
+int findPeakElement(vector<int> &nums)
+{
+    int n = nums.size();
+    if (n == 1)
+        return 0;
+    if (nums[0] > nums[1])
+        return 0;
+    if (nums[n - 1] > nums[n - 2])
+        return n - 1;
+    // Set left and right bounds
+    int low = 1, high = n - 2;
 
-class Solution {
-public:
-    // Function to find a peak element using binary search
-    int findPeakElement(vector<int>& nums) {
-        // Set left and right bounds
-        int low = 0, high = nums.size() - 1;
+    // Binary search loop
+    while (low < high)
+    {
+        // Find mid point
+        int mid = (low + high) / 2;
 
-        // Binary search loop
-        while (low < high) {
-            // Find mid point
-            int mid = (low + high) / 2;
-
-            // If mid element is greater than next
-            if (nums[mid] > nums[mid + 1]) {
-                // Move to left half
-                high = mid;
-            } else {
-                // Move to right half
-                low = mid + 1;
-            }
-        }
-
-        // Return peak index
-        return low;
+        if (nums[mid] > nums[mid - 1] && nums[mid] > nums[mid + 1])
+            return mid;
+        else if (nums[mid] > nums[mid + 1])
+            high = mid - 1;
+        else
+            low = mid + 1;
     }
 };
 
-int main() {
+int main()
+{
     // Input array
     vector<int> nums = {1, 2, 1, 3, 5, 6, 4};
-
-    // Create object
-    Solution obj;
-
     // Output result
-    cout << obj.findPeakElement(nums) << endl;
+    cout << findPeakElement(nums) << endl;
 
     return 0;
 }
